@@ -9,7 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "cli-table": "^0.3.11",
     "inquirer": "^8.2.4",
     "mysql2": "^3.2.4",
     "tablify": "^0.1.5"

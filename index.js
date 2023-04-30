@@ -150,7 +150,7 @@ const addRole = ()=>{
             const element = departmentChoices[i];
             if(ans.department == element){
             dep = i +1;
-            }
+            };
     };
             
         db.query(`INSERT INTO roles(title, salary, department_id)
@@ -227,8 +227,8 @@ const addEmployee = ()=>{
             const element = roleChoices[i];
             if(ans.role_id == element){
             role = i +1;
-            }
-        }
+            };
+        };
         db.query(`INSERT INTO employees (first_name, last_name, role_id, manager_id)
         VALUES (?,?,?,?)`,[ans.first_name,ans.last_name,role,ans.mngr_id], (err, data) => {
             if(err){
@@ -266,8 +266,8 @@ const update = () => {
             const element = roleChoices[i];
             if(ans.role_id == element){
             role = i +1;
-            }
-        }
+            };
+        };
         
         db.query(`UPDATE employees SET role_id = ? WHERE id = ?`,[role,ans.id], (err, data) => {
             if(err){
