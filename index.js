@@ -58,6 +58,7 @@ const viewDepartment = ()=>{
             table.push([row.departments])
         })
         console.log(table.toString());
+        menu();
     })
 }
 
@@ -76,6 +77,7 @@ const viewRoles = ()=>{
             table.push([row.title])
         })
         console.log(table.toString());
+        menu();
     })
 }
 const viewEmployees = ()=>{
@@ -93,6 +95,7 @@ const viewEmployees = ()=>{
             table.push([row.name])
         })
         console.log(table.toString());
+        menu();
     })
 }
 
@@ -138,11 +141,16 @@ const addRole = ()=>{
             }
            console.log(`
            -------Your role has been added!-------
-           `);
+           `
+           );
            menu();
+           
             })
         })
 }
+
+
+
 const addDepartment = ()=>{
     inquirer.prompt([
         {
@@ -158,9 +166,10 @@ const addDepartment = ()=>{
                 console.error("Error retrieving departements:", err);
                 return;
             }
-            departmentChoices.push(ans.name)
+            departmentChoices.push(ans.name);
            console.log(`
-           -------Your department has been added!-------`);
+           -------Your department has been added!-------
+           `);
            menu();
             })
         })
