@@ -1,21 +1,11 @@
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
-const tablify = require('tablify')
+const tablify = require('tablify');
+const db = require('./db/connection')
 let departmentChoices =["Sales", "Engineer", "Finance", "Legal", "Maintenance"];
 let roleChoices =["Sales Lead","Salesperson","Software Engineer", "Lead Engineer","Litigator","Groundskeeper"]
 
 
-//Connection to the Database
-const db = mysql.createConnection(
-    {
-      host: '127.0.0.1',
-      user: 'root',
-      password:'',
-      database: 'company_db'
-    },
-    console.log(`Connected to the company_db database.`)
-  );
-  
 
 
 
@@ -25,7 +15,7 @@ const db = mysql.createConnection(
             type: 'list',
             name: 'menu',
             message: "What would you like to do?",
-            choices: ["View All Departments", "Add Department","View All Roles", "Add Role", "View All Employees", "Add New Employee", "Update Employee Role", "View Employees/Roles","Quit"]
+            choices: ["View All Departments", "Add Department","View All Roles", "Add Role", "View All Employees", "Add New Employee", "Update Employee Role", "View Employees/Roles","Delete Role","Delete Employee","Quit"]
         }
     ]).then((ans) =>{
         switch (ans.menu) {
@@ -62,11 +52,14 @@ Good Bye 🚀
                     });
                 break;
             case "View Employees/Roles": empRole();
+                break;
+            case "Delete Role": deleteRole();
+                break;
+            case "Delete Employee": deleteEmployee();
+                break;
         }
     });
 }
-
-
 
 
 const viewDepartment = ()=>{
@@ -90,7 +83,7 @@ const viewDepartment = ()=>{
 
 const viewRoles = ()=>{
    
-    db.query(`SELECT title FROM roles`, (err, data) => {
+    db.query(`SELECT * FROM roles`, (err, data) => {
         if(err){
             console.error("Error retrieving departements:", err);
             return;
@@ -164,7 +157,7 @@ const addRole = ()=>{
            `
            );
            viewRoles();
-           menu();
+           
            
             })
         })
@@ -186,11 +179,11 @@ const addDepartment = ()=>{
                 return;
             }
             departmentChoices.push(ans.name);
-           console.log(`
-           -------Your department has been added!-------
-           `);
-           viewDepartment();
-           menu();
+            console.log(`
+            -------Your department has been added!-------
+            `);
+            viewDepartment();
+           
             })
         })
 }
@@ -240,7 +233,7 @@ const addEmployee = ()=>{
            `
            );
            viewEmployees();
-           menu();
+           
            
             })
         })
@@ -278,7 +271,7 @@ const update = () => {
             -------Your employees role has been updated!-------
             `);
             empRole();
-            menu();
+           
            })
     })
 }
@@ -299,9 +292,57 @@ const empRole = ()=> {
         }
         const table =tablify(data, options)
         console.log(table);
-        menu();
+        
     })
     menu();
 }
 
+const deleteRole = ()=>{
+    inquirer.prompt([
+        {
+        type: 'input',
+        name: 'id',
+        message: 'What Role would you like to delete?'
+        }
+
+    ]).then(ans =>{
+        db.query(`DELETE FROM roles WHERE ID=?`,[ans.id], (err, data) => {
+            if(err){
+                console.error("Error retrieving departements:", err);
+                return;
+            }
+            roleChoices = roleChoices.filter(choice => choice !== ans.name);
+;
+console.log(`
+-------Your role has been deleted!-------
+`);
+        viewRoles();
+           
+            })
+        })
+}
+
+const deleteEmployee = ()=>{
+    inquirer.prompt([
+        {
+        type: 'input',
+        name: 'id',
+        message: 'What Employee would you like to delete?'
+        }
+
+    ]).then(ans =>{
+        db.query(`DELETE FROM employees WHERE ID=?`,[ans.id], (err, data) => {
+            if(err){
+                console.error("Error retrieving departements:", err);
+                return;
+            }
+            
+            console.log(`
+            -------Your Employee has been deleted!-------
+            `);
+            viewEmployees();
+            
+            })
+        })
+}
 menu();
