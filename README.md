@@ -1,7 +1,7 @@
 # Employee Tracker
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)   
 ## Description
-   This is a dynamic user interface application for a company to track it's employees thier rolse and departments.  The user can Create, Read, Update, and Delete all information that is stored in the department, role and employee data groups. I learned about SQL interface using mysql2 and how to integrate inquirer prompts for user interaction. I also used tablify, which is an npm package that helps in formatting the data in node.js for ease of use. 
+   This is a dynamic user interface application for a company to track it's employees thier roles and departments. The user can Create, Read, Update, and Delete (CRUD) all information stored in the department, role and employee data groups. I learned about SQL interface using mysql2 and how to integrate inquirer prompts for user interaction. I also used tablify, which is an npm package that helps in formatting the data in node.js for more appealing ways of showing the data.
 
 
 ## Table of contents
