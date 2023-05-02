@@ -1,3 +1,5 @@
+
+
 DROP DATABASE IF EXISTS company_db;
 CREATE DATABASE company_db;
 
@@ -30,5 +32,5 @@ manager_id INT,
 );
 
 
-
+SET GLOBAL sql_slave_skip_counter = N
 

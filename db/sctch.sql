@@ -1,3 +1,3 @@
 USE company_db;
 
-SELECT * FROM roles;
+SELECT name AS departments, id FROM departments

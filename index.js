@@ -1,21 +1,18 @@
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
 const tablify = require('tablify');
+const options = { showRowNumber: false };
 const db = require('./db/connection')
 let departmentChoices =["Sales", "Engineer", "Finance", "Legal", "Maintenance"];
-let roleChoices =["Sales Lead","Salesperson","Software Engineer", "Lead Engineer","Litigator","Groundskeeper"]
+let roleChoices =["Sales Lead","Salesperson","Software Engineer", "Lead Engineer","Litigator","Groundskeeper"];
 
-
-
-
-
-  function menu(){
+function menu(){
     inquirer.prompt([
         {
             type: 'list',
             name: 'menu',
             message: "What would you like to do?",
-            choices: ["View All Departments", "Add Department","View All Roles", "Add Role", "View All Employees", "Add New Employee", "Update Employee Role", "View Employees/Roles","Delete Role","Delete Employee","Quit"]
+            choices: ["View All Departments", "Add Department","View All Roles", "Add Role", "View All Employees", "Add New Employee", "Update Employee Role", "View Employees/Roles","Delete Role","Delete Employee","Delete Department","Quit"]
         }
     ]).then((ans) =>{
         switch (ans.menu) {
@@ -32,6 +29,8 @@ let roleChoices =["Sales Lead","Salesperson","Software Engineer", "Lead Engineer
             case "Add New Employee": addEmployee();
                 break;
             case "Update Employee Role": update();
+                break;
+            case "Delete Department": deleteDepartment();
                 break;
             case "Quit": 
                     inquirer.prompt([
@@ -61,10 +60,9 @@ Good Bye 🚀
     });
 }
 
-
 const viewDepartment = ()=>{
    
-    db.query(`SELECT name AS departments FROM departments`, (err, data) => {
+    db.query(`SELECT name AS departments, id FROM departments`, (err, data) => {
         if(err){
             console.error("Error retrieving departements:", err);
             return;
@@ -101,7 +99,7 @@ const viewRoles = ()=>{
 }
 const viewEmployees = ()=>{
    
-    db.query(`SELECT CONCAT(first_name, ' ', last_name) AS name FROM employees`, (err, data) => {
+    db.query(`SELECT employees.id, CONCAT(employees.first_name, ' ', employees.last_name) AS fullname FROM employees`, (err, data) => {
         if(err){
             console.error("Error retrieving departements:", err);
             return;
@@ -152,9 +150,11 @@ const addRole = ()=>{
                 console.error("Error retrieving departements:", err);
                 return;
             }
+            roleChoices.push(ans)
            console.log(`
            -------Your role has been added!-------
            `
+
            );
            viewRoles();
            
@@ -240,46 +240,53 @@ const addEmployee = ()=>{
 }
 
 const update = () => {
-    inquirer.prompt([
+    db.query(`SELECT CONCAT(first_name, ' ', last_name) AS fullname FROM employees`, (err, data) => {
+      if (err) {
+        console.error("Error retrieving employees:", err);
+        return;
+      }
+      inquirer.prompt([
         {
-        type: 'input',
-        name: 'id',
-        message: 'What is the employees ID that you would like to update?'
+          type: 'list',
+          name: 'employee',
+          message: 'Which employee would you like to update?',
+          choices: () => data.map(row => row.fullname)
         },
-
         {
-        type: 'list',
-        name: 'role_id',
-        message: 'What is the employees new role?',
-        choices: roleChoices
+          type: 'list',
+          name: 'role',
+          message: `What is the employee's new role?`,
+          choices: roleChoices
         }
-    ]).then((ans)=> {
-        let role;
+      ]).then(ans => {
+        let roleId;
         for (let i = 0; i < roleChoices.length; i++) {
-            const element = roleChoices[i];
-            if(ans.role_id == element){
-            role = i +1;
-            };
-        };
-        
-        db.query(`UPDATE employees SET role_id = ? WHERE id = ?`,[role,ans.id], (err, data) => {
-            if(err){
-                console.error("Error retrieving departements:", err);
-                return;
-            }
-            console.log(`
-            -------Your employees role has been updated!-------
-            `);
-            empRole();
-           
-           })
-    })
-}
-
-
+          if (ans.role === roleChoices[i]) {
+            roleId = i + 1;
+            break;
+          }
+        }
+  
+        const fullName = ans.employee.split(' ');
+        const firstName = fullName[0];
+        const lastName = fullName[1];
+        db.query(`UPDATE employees SET role_id = ? WHERE first_name = ? AND last_name = ?`, [roleId, firstName, lastName], (err, data) => {
+          if (err) {
+            console.error("Error updating employee role:", err);
+            return;
+          }
+          console.log(`
+    -------Employee role updated!-------
+          `);
+          empRole();
+        });
+      });
+    });
+  };
+  
 const empRole = ()=> {
-    db.query(`SELECT employees.first_name AS  "first name",employees.last_name AS "last name",
-    roles.title FROM employees JOIN  roles on roles.id=employees.role_id`, (err, data) => {
+    db.query(`SELECT employees.first_name AS  "first name",employees.last_name AS "last name", employees.id,
+    roles.title FROM employees JOIN  roles on roles.id=employees.role_id;`, (err, data) => {
         if(err){
             console.error("Error retrieving departements:", err);
             return;
@@ -302,7 +309,7 @@ const deleteRole = ()=>{
         {
         type: 'input',
         name: 'id',
-        message: 'What Role would you like to delete?'
+        message: `What is the id of the role you wish to delete?`
         }
 
     ]).then(ans =>{
@@ -312,6 +319,7 @@ const deleteRole = ()=>{
                 return;
             }
             roleChoices = roleChoices.filter(choice => choice !== ans.name);
+
 ;
 console.log(`
 -------Your role has been deleted!-------
@@ -327,7 +335,7 @@ const deleteEmployee = ()=>{
         {
         type: 'input',
         name: 'id',
-        message: 'What Employee would you like to delete?'
+        message:`What is your Employee's id that would you like to delete?`
         }
 
     ]).then(ans =>{
@@ -345,4 +353,31 @@ const deleteEmployee = ()=>{
             })
         })
 }
+
+const deleteDepartment = ()=>{
+    inquirer.prompt([
+        {
+        type: 'input',
+        name: 'id',
+        message: `What is the id of the department you wish to delete?`
+        }
+
+    ]).then(ans =>{
+        db.query(`DELETE FROM departments WHERE ID=?`,[ans.id], (err, data) => {
+            if(err){
+                console.error("Error retrieving departements:", err);
+                return;
+            }
+            roleChoices = roleChoices.filter(choice => choice !== ans.name);
+
+;
+console.log(`
+-------Your department has been deleted!-------
+`);
+        viewDepartment();
+           
+            })
+        })
+}
+
 menu();
