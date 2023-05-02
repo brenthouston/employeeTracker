@@ -16,9 +16,15 @@
   After cloning the repo, open the integrated terminal and run npm install. Then run "node index.js" and use your arrow keys to select from the prompts that are presented.
     
 ## Usage
-  Please the walk though video below.
-* [Video Walk Through](https://drive.google.com/file/d/1Qtk3apQORqgfdSMZaH7Fdtj96ov94neG/view)    
-![Image of Application](https://photos.google.com/album/AF1QipNRTa0vwREUb1vlCNl8VqF9pHS1lOBDwnTa2ywr)
+  Please click link for walk-though video below:
+* [Video Walk Through](https://drive.google.com/file/d/1Qtk3apQORqgfdSMZaH7Fdtj96ov94neG/view) 
+
+
+
+Screenshot of application in use:
+
+<img src="./images/Screenshot%202023-05-01%20at%209.36.56%20PM.png" alt="Application Screenshot" height="400px">
+
 
 ## License
 * [License Link](https://opensource.org/license/mit/)
